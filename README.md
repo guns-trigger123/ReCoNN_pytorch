@@ -4,6 +4,41 @@ This is the **unofficial** pytorch version implementation of the paper "Regulari
 for
 solving Partial Differential Equations".
 
+## Tips
+
+There are several mistakes about the equations of the paper. 
+
+Assume the figures are correct, and then the equations should be consistent with the figures.
+
+1. equation(1) should be
+
+$$
+u(x) = 
+ \begin{cases}
+ \frac{1}{3} \sin (2x),\,\,x \in [0, \frac{\pi}{2}],\\
+ \sin (2x),\,\,x \in [\frac{\pi}{2}, \pi].\\
+ \end{cases}
+$$
+
+2. equation(28) should be
+
+$$
+\sigma(x) = 
+ \begin{cases}
+ 3,\,\,\lvert x \rvert < \frac{1}{2},\\
+ 1,\,\,else.\\
+ \end{cases}
+$$
+
+3. equation(29) should be
+
+$$
+u^*(x)=\frac{(x_1^2-1)(x_2^2-1)(4x_1^2+4x_2^2-1)}{\sigma(x)}
+$$
+
+4. maybe there are other mistakes
+
+
 ## Numerical results
 
 ### 1 1D Transmission problem
@@ -14,6 +49,14 @@ XPINNs[[2]](https://doi.org/10.4208/cicp.OA-2020-0164)" with those of "ReCoNNs".
 ![PINN](./assets/1D_case/PINN.png)
 ![xPINN](./assets/1D_case/xPINN.png)
 ![ReCoNN](./assets/1D_case/ReCoNN.png)
+
+### 2 Smooth material interface
+
+Compare the results of real solution with those of "ReCoNNs".
+
+![real](./assets/2D_smooth/real.png)
+![ReCoNN](./assets/2D_smooth/ReCoNN.png)
+![error](./assets/2D_smooth/error.png)
 
 ## Citation
 
