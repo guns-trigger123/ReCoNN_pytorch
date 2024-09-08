@@ -4,9 +4,9 @@ from torch import nn
 from utils import *
 
 
-class MLP_2D(nn.Module):
+class MLP_2D_SMOOTH(nn.Module):
     def __init__(self, zsf: []):
-        super(MLP_2D, self).__init__()
+        super(MLP_2D_SMOOTH, self).__init__()
         self.zsf = zsf  # zsf stands for zero set function
         self.num_zsf = len(zsf)
         self.fcn = nn.Sequential(
@@ -24,8 +24,8 @@ class MLP_2D(nn.Module):
         for layer in self.fcn:
             x = layer(x)
         out = x[:, 0:1]
-        for i, phi in enumerate(self.zsf):
-            out = out + x[:, i + 1:i + 2] * torch.abs(phi(input))
+        for i, varphi in enumerate(self.zsf):
+            out = out + x[:, i + 1:i + 2] * torch.abs(varphi(input))
         return out
 
     def ui(self, x, i: int):
@@ -35,7 +35,7 @@ class MLP_2D(nn.Module):
         return out
 
 
-def phi(x):
+def varphi(x):
     return x[:, 0:1] ** 2 + x[:, 1:2] ** 2 - 0.25
 
 
@@ -73,7 +73,7 @@ def bc(NUM_BOUNDARY):
 
 if __name__ == '__main__':
     device = torch.device('cuda')
-    model = MLP_2D([phi])
+    model = MLP_2D_SMOOTH([varphi])
     model.to(device)
     criterion = torch.nn.MSELoss()
     opt = optim.Adam(model.parameters(), lr=1e-3)
@@ -85,7 +85,7 @@ if __name__ == '__main__':
     zeros = torch.zeros_like(x[:, 0:1], device=x.device)
 
     x_int = interface(torch.rand(size=(1000, 1)) * 2 * torch.pi).to(device).requires_grad_()
-    gp_x_int = gradient(phi(x_int), x_int).detach()  # gp stands for grad_phi
+    gp_x_int = gradient(varphi(x_int), x_int).detach()  # gp stands for grad_phi
     gnp_x_int = torch.sqrt(gp_x_int[:, 0:1] ** 2 + gp_x_int[:, 1:2] ** 2)  # gnp stands for grad_norm_phi
     nv_x_int = gp_x_int / gnp_x_int  # nv stands for normal vector, also miu(x) in the paper
     zeros_int = torch.zeros_like(x_int[:, 0:1], device=x_int.device)

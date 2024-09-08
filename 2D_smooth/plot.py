@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
 from utils import *
-from train_ReCoNN_2D_smooth import MLP_2D
+from train_ReCoNN_2D_smooth import MLP_2D_SMOOTH
 
 
-def phi(x):
+def varphi(x):
     return x[:, 0:1] ** 2 + x[:, 1:2] ** 2 - 0.25
 
 
@@ -23,7 +23,7 @@ def real(x):
 
 
 def plot_ReCoNN():
-    model = MLP_2D([phi])
+    model = MLP_2D_SMOOTH([varphi])
     model.load_state_dict(torch.load(("../saved_models/2D_smooth/ReCoNN_50000.pt")))
 
     x, y = torch.linspace(-1, 1, 256), torch.linspace(-1, 1, 256)

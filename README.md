@@ -15,8 +15,8 @@ Assume the figures are correct, and then the equations should be consistent with
 $$
 u(x) = 
  \begin{cases}
- \frac{1}{3} \sin (2x),\,\,x \in [0, \frac{\pi}{2}],\\
- \sin (2x),\,\,x \in [\frac{\pi}{2}, \pi].\\
+ \frac{1}{3} \sin (2x),x \in [0, \frac{\pi}{2}],\\
+ \sin (2x),x \in [\frac{\pi}{2}, \pi].\\
  \end{cases}
 $$
 
@@ -25,8 +25,8 @@ $$
 $$
 \sigma(x) = 
  \begin{cases}
- 3,\,\,\lvert x \rvert < \frac{1}{2},\\
- 1,\,\,else.\\
+ 3,\lvert x \rvert < \frac{1}{2},\\
+ 1,else.\\
  \end{cases}
 $$
 
@@ -36,9 +36,15 @@ $$
 u^*(x)=\frac{(x_1^2-1)(x_2^2-1)(4x_1^2+4x_2^2-1)}{\sigma(x)}
 $$
 
-4. maybe there are other mistakes
+4. equation(32) should be
 
+$$
+s_0(r,\theta)=r^\frac{2}{3}\sin \left( \frac{2}{3}\left(\theta+\frac{\pi}{2}\right) \right)
+$$
 
+5. page 18, below equation(34). The text content "We set ..." should be "We set $\delta_1=0.5$ $\delta_2=0.9$ in our implementation."
+
+maybe there are other mistakes.
 ## Numerical results
 
 ### 1 1D Transmission problem
@@ -57,6 +63,22 @@ Compare the results of real solution with those of "ReCoNNs".
 ![real](./assets/2D_smooth/real.png)
 ![ReCoNN](./assets/2D_smooth/ReCoNN.png)
 ![error](./assets/2D_smooth/error.png)
+
+### 3 L-shape domain
+
+Results of the real solution with those of "ReCoNNs".
+
+![real](./assets/2D_L_shape/real.png)
+![ReCoNN](./assets/2D_L_shape/ReCoNN.png)
+![error](./assets/2D_L_shape/error.png)
+
+The NN function $\phi$ and the target $\sin$ fuction.
+
+![phi](./assets/2D_L_shape/ReCoNN_phi.png)
+
+The trainalbe parameter $\lambda$ changes with the iterations.
+
+![lambda](./assets/2D_L_shape/ReCoNN_lambda.png)
 
 ## Citation
 
