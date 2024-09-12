@@ -70,9 +70,13 @@ Compare the results of real solution with those of "ReCoNNs".
 
 The neuron-counts for the implemented NN:
 
-- Function $w$ : $2012 = \underbrace{2\times30+30}_{L1} + \underbrace{30\times30+30}_{L2} + \underbrace{30\times30+30}_{L3} + \underbrace{30\times2+2}_{L4}$  
+- Function $w$ :
+  
+  $2012 = \underbrace{2\times30+30}\_{L1} + \underbrace{30\times30+30}\_{L2} + \underbrace{30\times30+30}\_{L3} + \underbrace{30\times2+2}\_{L4}$ 
 
-- Function $\phi$ : $541$ (maybe not $542$) $= \underbrace{2\times15+15}_{L1} + \underbrace{15\times15+15}_{L2} + \underbrace{15\times15+15}_{L3} + \underbrace{15\times1+1}_{L4}$  
+- Function $\phi$ :
+
+  $541 (\neq 542) = \underbrace{2\times15+15}\_{L1} + \underbrace{15\times15+15}\_{L2} + \underbrace{15\times15+15}\_{L3} + \underbrace{15\times1+1}\_{L4}$  
 
 - Trainalbe $\lambda$ : $1$
 
@@ -104,9 +108,13 @@ It is hard to understand/implement this experiment for the 2 reasons below.
 
 The neuron-counts for the implemented NN (personal guess) :
 
-- Function $w$ : $2136 = \underbrace{2\times30+30}_{L1} + \underbrace{30\times30+30}_{L2} + \underbrace{30\times30+30}_{L3} + \underbrace{30\times6+6}_{L4}$  
+- Function $w$ :
 
-- Function $\phi$ : $573 = \underbrace{2\times15+15}_{L1} + \underbrace{15\times15+15}_{L2} + \underbrace{15\times15+15}_{L3} + \underbrace{15\times3+3}_{L4}$  
+  $2136 = \underbrace{2\times30+30}\_{L1} + \underbrace{30\times30+30}\_{L2} + \underbrace{30\times30+30}\_{L3} + \underbrace{30\times6+6}\_{L4}$  
+
+- Function $\phi$ :
+ 
+  $573 = \underbrace{2\times15+15}\_{L1} + \underbrace{15\times15+15}\_{L2} + \underbrace{15\times15+15}\_{L3} + \underbrace{15\times3+3}\_{L4}$  
 
 - Trainable $\lambda$ : $1$
 
@@ -115,12 +123,14 @@ The neuron-counts for the implemented NN (personal guess) :
 The specific expression of $u_{NN}$ in my implementation (personal guess) :
 
 $$
-\begin{equation}
-u_{NN} = w_{1,0}(x) + w_{2,0}(x)\eta(\lvert x-x_0 \rvert) \\
-+ [w_{1,1}(x)+ w_{2,1}(x)\eta(\lvert x-x_0 \rvert)]\lvert \varphi_1(x)\rvert \\
-+ [w_{1,2}(x)+ w_{2,2}(x)\eta(\lvert x-x_0 \rvert)]\lvert \varphi_2(x)\rvert + \\
- \eta(\lvert x-x_0 \rvert)\lvert x-x_0 \rvert^{\lambda}[\phi_1(\frac{x-x_0}{\lvert x-x_0 \rvert})+\phi_2(\frac{x-x_0}{\lvert x-x_0 \rvert})\lvert \hat\varphi_1(\frac{x-x_0}{\lvert x-x_0 \rvert}) \rvert+\phi_3(\frac{x-x_0}{\lvert x-x_0 \rvert})\lvert \hat\varphi_2(\frac{x-x_0}{\lvert x-x_0 \rvert}) \rvert]
-\end{equation}
+u_{NN} = w_{1,0}(x) + w_{2,0}(x)\eta(\lvert x-x_0 \rvert) + [w_{1,1}(x)+ w_{2,1}(x)\eta(\lvert x-x_0 \rvert)]\lvert \varphi_1(x)\rvert + [w_{1,2}(x)+ w_{2,2}(x)\eta(\lvert x-x_0 \rvert)]\lvert \varphi_2(x)\rvert + 
+ \eta(\lvert x-x_0 \rvert){\lvert x-x_0 \rvert}^{\lambda}[\phi_1(\frac{x-x_0}{\lvert x-x_0 \rvert})+\phi_2(\frac{x-x_0}{\lvert x-x_0 \rvert})\lvert \hat\varphi_1(\frac{x-x_0}{\lvert x-x_0 \rvert}) \rvert+\phi_3(\frac{x-x_0}{\lvert x-x_0 \rvert})\lvert \hat\varphi_2(\frac{x-x_0}{\lvert x-x_0 \rvert}) \rvert]
+$$
+
+where
+
+$$
+\varphi_1(\vec{x}) = \hat\varphi_1(\vec{x}) = x_1 \quad\rm{and}\quad \varphi_2(\vec{x}) = \hat\varphi_2(\vec{x}) = x_2
 $$
 
 Results of the real solution with those of "ReCoNNs".
