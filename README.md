@@ -6,28 +6,28 @@ solving Partial Differential Equations".
 
 ## Tips
 
-There are several mistakes about the equations of the paper. 
+There are several mistakes about the equations of the paper.
 
 Assume the figures are correct, and then the equations should be consistent with the figures.
 
 1. equation(1) should be
 
 $$
-u(x) = 
- \begin{cases}
- \frac{1}{3} \sin (2x),x \in [0, \frac{\pi}{2}],\\
- \sin (2x),x \in [\frac{\pi}{2}, \pi].\\
- \end{cases}
+u(x) =
+\begin{cases}
+\frac{1}{3} \sin (2x),x \in [0, \frac{\pi}{2}],\\
+\sin (2x),x \in [\frac{\pi}{2}, \pi].\\
+\end{cases}
 $$
 
 2. equation(28) should be
 
 $$
-\sigma(x) = 
- \begin{cases}
- 3,\lvert x \rvert < \frac{1}{2},\\
- 1,else.\\
- \end{cases}
+\sigma(x) =
+\begin{cases}
+3,\lvert x \rvert < \frac{1}{2},\\
+1,else.\\
+\end{cases}
 $$
 
 3. equation(29) should be
@@ -42,9 +42,11 @@ $$
 s_0(r,\theta)=r^\frac{2}{3}\sin \left( \frac{2}{3}\left(\theta+\frac{\pi}{2}\right) \right)
 $$
 
-5. page 18, below equation(34). The text content "We set ..." should be "We set $\delta_1=0.5$ $\delta_2=0.9$ in our implementation."
+5. page 18, below equation(34). The text content "We set ..." should be "We set $\delta_1=0.5$ $\delta_2=0.9$ in our
+   implementation."
 
 maybe there are other mistakes.
+
 ## Numerical results
 
 ### 1 1D Transmission problem
@@ -79,6 +81,26 @@ The NN function $\phi$ and the target $\sin$ fuction.
 The trainalbe parameter $\lambda$ changes with the iterations.
 
 ![lambda](./assets/2D_L_shape/ReCoNN_lambda.png)
+
+### 4 Interior material vertices
+
+It is hard to understand/implement this experiment for the 2 reasons below.
+
+1. The description of the NN structure is not very clear.
+
+2. The most confusing part is the loss for the interface. In my implementation, I did not take the $\phi$ part of NN
+   into consideration as the "input" of formula derivation in Section 4.1, specifically equations (13 -18), are not "
+   normalized input". Maybe there are more formula derivation for the "normalized input" ?
+
+Results of the real solution with those of "ReCoNNs".(18500 iterations, to be continue)
+
+![real](./assets/2D_material/real.png)
+![ReCoNN](./assets/2D_material/ReCoNN.png)
+![error](./assets/2D_material/error.png)
+
+The NN function $\phi$ and the target $\sin$ fuction.
+
+![phi](./assets/2D_material/ReCoNN_phi.png)
 
 ## Citation
 
