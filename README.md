@@ -6,28 +6,28 @@ solving Partial Differential Equations".
 
 ## Tips
 
-There are several mistakes about the equations of the paper. 
+There are several mistakes about the equations of the paper.
 
 Assume the figures are correct, and then the equations should be consistent with the figures.
 
 1. equation(1) should be
 
 $$
-u(x) = 
- \begin{cases}
- \frac{1}{3} \sin (2x),x \in [0, \frac{\pi}{2}],\\
- \sin (2x),x \in [\frac{\pi}{2}, \pi].\\
- \end{cases}
+u(x) =
+\begin{cases}
+\frac{1}{3} \sin (2x),x \in [0, \frac{\pi}{2}],\\
+\sin (2x),x \in [\frac{\pi}{2}, \pi].\\
+\end{cases}
 $$
 
 2. equation(28) should be
 
 $$
-\sigma(x) = 
- \begin{cases}
- 3,\lvert x \rvert < \frac{1}{2},\\
- 1,else.\\
- \end{cases}
+\sigma(x) =
+\begin{cases}
+3,\lvert x \rvert < \frac{1}{2},\\
+1,else.\\
+\end{cases}
 $$
 
 3. equation(29) should be
@@ -42,9 +42,11 @@ $$
 s_0(r,\theta)=r^\frac{2}{3}\sin \left( \frac{2}{3}\left(\theta+\frac{\pi}{2}\right) \right)
 $$
 
-5. page 18, below equation(34). The text content "We set ..." should be "We set $\delta_1=0.5$ $\delta_2=0.9$ in our implementation."
+5. page 18, below equation(34). The text content "We set ..." should be "We set $\delta_1=0.5$ $\delta_2=0.9$ in our
+   implementation."
 
 maybe there are other mistakes.
+
 ## Numerical results
 
 ### 1 1D Transmission problem
@@ -66,6 +68,16 @@ Compare the results of real solution with those of "ReCoNNs".
 
 ### 3 L-shape domain
 
+The neuron-counts for the implemented NN:
+
+- Function $w$ : $2012 = \underbrace{2\times30+30}_{L1} + \underbrace{30\times30+30}_{L2} + \underbrace{30\times30+30}_{L3} + \underbrace{30\times2+2}_{L4}$  
+
+- Function $\phi$ : $541$ (maybe not $542$) $= \underbrace{2\times15+15}_{L1} + \underbrace{15\times15+15}_{L2} + \underbrace{15\times15+15}_{L3} + \underbrace{15\times1+1}_{L4}$  
+
+- Trainalbe $\lambda$ : $1$
+
+- Total : $2554 = 2012+541+1$
+
 Results of the real solution with those of "ReCoNNs".
 
 ![real](./assets/2D_L_shape/real.png)
@@ -79,6 +91,47 @@ The NN function $\phi$ and the target $\sin$ fuction.
 The trainalbe parameter $\lambda$ changes with the iterations.
 
 ![lambda](./assets/2D_L_shape/ReCoNN_lambda.png)
+
+### 4 Interior material vertices
+
+It is hard to understand/implement this experiment for the 2 reasons below.
+
+1. The description of the NN structure is not very clear.
+
+2. The most confusing part is the loss for the interface. In my implementation, I did not take the $\phi$ part of NN
+   into consideration as the "input" of formula derivation in Section 4.1, specifically equations (13 -18), are not "
+   normalized input". Maybe there are more formula derivation for the "normalized input" ?
+
+The neuron-counts for the implemented NN (personal guess) :
+
+- Function $w$ : $2136 = \underbrace{2\times30+30}_{L1} + \underbrace{30\times30+30}_{L2} + \underbrace{30\times30+30}_{L3} + \underbrace{30\times6+6}_{L4}$  
+
+- Function $\phi$ : $573 = \underbrace{2\times15+15}_{L1} + \underbrace{15\times15+15}_{L2} + \underbrace{15\times15+15}_{L3} + \underbrace{15\times3+3}_{L4}$  
+
+- Trainable $\lambda$ : $1$
+
+- Total : $2710=2136+573+1$
+
+The specific expression of $u_{NN}$ in my implementation (personal guess) :
+
+$$
+\begin{equation}
+u_{NN} = w_{1,0}(x) + w_{2,0}(x)\eta(\lvert x-x_0 \rvert) \\
++ [w_{1,1}(x)+ w_{2,1}(x)\eta(\lvert x-x_0 \rvert)]\lvert \varphi_1(x)\rvert \\
++ [w_{1,2}(x)+ w_{2,2}(x)\eta(\lvert x-x_0 \rvert)]\lvert \varphi_2(x)\rvert + \\
+ \eta(\lvert x-x_0 \rvert)\lvert x-x_0 \rvert^{\lambda}[\phi_1(\frac{x-x_0}{\lvert x-x_0 \rvert})+\phi_2(\frac{x-x_0}{\lvert x-x_0 \rvert})\lvert \hat\varphi_1(\frac{x-x_0}{\lvert x-x_0 \rvert}) \rvert+\phi_3(\frac{x-x_0}{\lvert x-x_0 \rvert})\lvert \hat\varphi_2(\frac{x-x_0}{\lvert x-x_0 \rvert}) \rvert]
+\end{equation}
+$$
+
+Results of the real solution with those of "ReCoNNs".
+
+![real](./assets/2D_material/real.png)
+![ReCoNN](./assets/2D_material/ReCoNN.png)
+![error](./assets/2D_material/error.png)
+
+The NN function $\phi$ and the target $\sin$ fuction.
+
+![phi](./assets/2D_material/ReCoNN_phi.png)
 
 ## Citation
 
