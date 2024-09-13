@@ -160,14 +160,6 @@ If you find their work useful in your research, please cite:
   year={2024}
 }
 ```
-## P.S.
-
-Welcome everything (issues / pull request / discussion / comments / ...). 
-
-And for the last numerical experiment (Interior material vertices), if the orginal authors have seenn, I would beg to to know more details for coding / implementation.
-
-orz.
-
 
 ## Other reference
 
