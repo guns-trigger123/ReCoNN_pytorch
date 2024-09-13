@@ -1,5 +1,7 @@
 # Regularity-Conforming Neural Networks (ReCoNNs) for solving Partial Differential Equations
 
+The **official** version : https://github.com/Mathmode/ReCoNNs
+
 This is the **unofficial** pytorch version implementation of the paper "Regularity-Conforming Neural Networks (ReCoNNs)
 for
 solving Partial Differential Equations".
