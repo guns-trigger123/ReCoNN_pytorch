@@ -144,7 +144,16 @@ def s0(x):
     PIs_add = torch.where(x[:, 1:2] < 0, PIs, zeros)
     theta = theta + PIs_add + torch.pi / 2
 
-    lmbd = 0.8599
+    a1 = 3.58396766000856
+    a2 = 3.28530926421398
+    a3 = 2.47465193074208
+    a4 = 2.11503551932097
+    b1 = -2.00351054735044
+    b2 = -0.667838639957490
+    b3 = -1.04946191312213
+    b4 = -0.586064428952415
+
+    lmbd = 0.8599513039
     theta = lmbd * theta
 
     ones = torch.ones_like(x[:, 0:1], device=x.device)
@@ -154,10 +163,10 @@ def s0(x):
     quad3 = torch.where((x[:, 0:1] < 0) & (x[:, 1:2] < 0), ones, zeros)
     quad4 = torch.where((x[:, 0:1] > 0) & (x[:, 1:2] < 0), ones, zeros)
 
-    s1 = (r ** lmbd) * (3.584 * torch.sin(theta) - 2.003 * torch.cos(theta)) * quad1
-    s2 = (r ** lmbd) * (3.285 * torch.sin(theta) - 0.6678 * torch.cos(theta)) * quad2
-    s3 = (r ** lmbd) * (2.474 * torch.sin(theta) - 1.0495 * torch.cos(theta)) * quad3
-    s4 = (r ** lmbd) * (2.115 * torch.sin(theta) - 0.5861 * torch.cos(theta)) * quad4
+    s1 = (r ** lmbd) * (a1 * torch.sin(theta) + b1 * torch.cos(theta)) * quad1
+    s2 = (r ** lmbd) * (a2 * torch.sin(theta) + b2 * torch.cos(theta)) * quad2
+    s3 = (r ** lmbd) * (a3 * torch.sin(theta) + b3 * torch.cos(theta)) * quad3
+    s4 = (r ** lmbd) * (a4 * torch.sin(theta) + b4 * torch.cos(theta)) * quad4
 
     return s1 + s2 + s3 + s4
 
@@ -252,22 +261,22 @@ if __name__ == '__main__':
     nv_x_int3 = gv_x_int3 / gnv_x_int3
     int_w3 = int_weight(x_int3, model.imv[0])
 
-    x_phi0 = torch.tensor([[0.0, 1.0]], device=device).requires_grad_()  # already normalized
+    x_phi0 = torch.tensor([[0.0, 0.0125]], device=device).requires_grad_()  # already normalized
     # absv_phi0 = torch.abs(varphi1(x_phi0)).detach()
     gv_x_phi0 = gradient(varphi0(x_phi0), x_phi0).detach()
     gnv_x_phi0 = torch.norm(gv_x_phi0, p=2, dim=1, keepdim=True)
     nv_x_phi0 = gv_x_phi0 / gnv_x_phi0
-    x_phi1 = torch.tensor([[-1.0, 0.0]], device=device).requires_grad_()
+    x_phi1 = torch.tensor([[-0.0125, 0.0]], device=device).requires_grad_()
     # absv_phi1 = torch.abs(varphi0(x_phi1)).detach()
     gv_x_phi1 = gradient(varphi1(x_phi1), x_phi1).detach()
     gnv_x_phi1 = torch.norm(gv_x_phi1, p=2, dim=1, keepdim=True)
     nv_x_phi1 = gv_x_phi1 / gnv_x_phi1
-    x_phi2 = torch.tensor([[0.0, -1.0]], device=device).requires_grad_()
+    x_phi2 = torch.tensor([[0.0, -0.0125]], device=device).requires_grad_()
     # absv_phi2 = torch.abs(varphi1(x_phi2)).detach()
     gv_x_phi2 = gradient(varphi0(x_phi2), x_phi2).detach()
     gnv_x_phi2 = torch.norm(gv_x_phi2, p=2, dim=1, keepdim=True)
     nv_x_phi2 = gv_x_phi2 / gnv_x_phi2
-    x_phi3 = torch.tensor([[1.0, 0.0]], device=device).requires_grad_()
+    x_phi3 = torch.tensor([[0.0125, 0.0]], device=device).requires_grad_()
     # absv_phi3 = torch.abs(varphi0(x_phi3)).detach()
     gv_x_phi3 = gradient(varphi1(x_phi3), x_phi3).detach()
     gnv_x_phi3 = torch.norm(gv_x_phi3, p=2, dim=1, keepdim=True)
@@ -282,109 +291,167 @@ if __name__ == '__main__':
         u_bc = model(x_bc)
         loss_bc = criterion(u_bc, zeros_bc)
 
+        r_int0 = torch.norm(x_int0 - model.imv[0], p=2, dim=1, keepdim=True)
+        yita_int0 = model._yita(r_int0)
+        x_ba_int0 = (x_int0 - model.imv[0]) / r_int0
+        phi0_int0 = model.phi_p(x_ba_int0, 0) * yita_int0 * (r_int0 ** model.lmbd[0])
+        phi1_int0 = model.phi_p(x_ba_int0, 1) * yita_int0 * (r_int0 ** (model.lmbd[0]-1))
+        phi2_int0 = model.phi_p(x_ba_int0, 2) * yita_int0 * (r_int0 ** model.lmbd[0])
+        absv_ba_int0 = torch.abs(varphi1(x_ba_int0))
+        grad_phi_ba_term0 = gradient(phi0_int0 + phi2_int0 * absv_ba_int0, x_int0)
+        dd_phi_ba_term0 = torch.sum(grad_phi_ba_term0 * nv_x_int0, dim=1, keepdim=True)
+        # loss_ba_int0 = torch.mean(int_w0 * ((-1 * dd_phi_ba_term0 + 3 * phi1_int0 * gnv_x_int0) ** 2))
+
+        r_int1 = torch.norm(x_int1 - model.imv[0], p=2, dim=1, keepdim=True)
+        yita_int1 = model._yita(r_int1)
+        x_ba_int1 = (x_int1 - model.imv[0]) / r_int1
+        phi0_int1 = model.phi_p(x_ba_int1, 0) * yita_int1 * (r_int1 ** model.lmbd[0])
+        phi1_int1 = model.phi_p(x_ba_int1, 1) * yita_int1 * (r_int1 ** model.lmbd[0])
+        phi2_int1 = model.phi_p(x_ba_int1, 2) * yita_int1 * (r_int1 ** (model.lmbd[0]-1))
+        absv_ba_int1 = torch.abs(varphi0(x_ba_int1))
+        grad_phi_ba_term1 = gradient(phi0_int1 + phi1_int1 * absv_ba_int1, x_int1)
+        dd_phi_ba_term1 = torch.sum(grad_phi_ba_term1 * nv_x_int1, dim=1, keepdim=True)
+        # loss_ba_int1 = torch.mean(int_w1 * ((-1 * dd_phi_ba_term1 + 5 * phi2_int1 * gnv_x_int1) ** 2))
+
+        r_int2 = torch.norm(x_int2 - model.imv[0], p=2, dim=1, keepdim=True)
+        yita_int2 = model._yita(r_int2)
+        x_ba_int2 = (x_int2 - model.imv[0]) / r_int2
+        phi0_int2 = model.phi_p(x_ba_int2, 0) * yita_int2 * (r_int2 ** model.lmbd[0])
+        phi1_int2 = model.phi_p(x_ba_int2, 1) * yita_int2 * (r_int2 ** (model.lmbd[0]-1))
+        phi2_int2 = model.phi_p(x_ba_int2, 2) * yita_int2 * (r_int2 ** model.lmbd[0])
+        absv_ba_int2 = torch.abs(varphi1(x_ba_int2))
+        grad_phi_ba_term2 = gradient(phi0_int2 + phi2_int2 * absv_ba_int2, x_int2)
+        dd_phi_ba_term2 = torch.sum(grad_phi_ba_term2 * nv_x_int2, dim=1, keepdim=True)
+        # loss_ba_int2 = torch.mean(int_w2 * ((1 * dd_phi_ba_term2 + 7 * phi1_int2 * gnv_x_int2) ** 2))
+
+        r_int3 = torch.norm(x_int3 - model.imv[0], p=2, dim=1, keepdim=True)
+        yita_int3 = model._yita(r_int3)
+        x_ba_int3 = (x_int3 - model.imv[0]) / r_int3
+        phi0_int3 = model.phi_p(x_ba_int3, 0) * yita_int3 * (r_int3 ** model.lmbd[0])
+        phi1_int3 = model.phi_p(x_ba_int3, 1) * yita_int3 * (r_int3 ** model.lmbd[0])
+        phi2_int3 = model.phi_p(x_ba_int3, 2) * yita_int3 * (r_int3 ** (model.lmbd[0]-1))
+        absv_ba_int3 = torch.abs(varphi0(x_ba_int3))
+        grad_phi_ba_term3 = gradient(phi0_int3 + phi1_int3 * absv_ba_int3, x_int3)
+        dd_phi_ba_term3 = torch.sum(grad_phi_ba_term3 * nv_x_int3, dim=1, keepdim=True)
+        loss_ba_int3 = torch.mean(int_w3 * ((-3 * dd_phi_ba_term3 + 5 * phi2_int3 * gnv_x_int3) ** 2))
+        # loss_ba_int = (loss_ba_int0 + loss_ba_int1 + loss_ba_int2 + loss_ba_int3) / 4
+
         w0_int0 = model.w_p(x_int0, 0)
         w1_int0 = model.w_p(x_int0, 1)
         w2_int0 = model.w_p(x_int0, 2)
-        # r_int0 = torch.norm(x_int0 - model.imv[0], p=2, dim=1, keepdim=True)
-        # yita_int0 = model._yita(r_int0)
-        # phi0_int0 = model.phi_p(x_int0, 0) * yita_int0 * (r_int0 ** model.lmbd[0])
-        # phi1_int0 = model.phi_p(x_int0, 1) * yita_int0 * (r_int0 ** model.lmbd[0])
-        # phi2_int0 = model.phi_p(x_int0, 2) * yita_int0 * (r_int0 ** model.lmbd[0])
-        # w0_int0 = w0_int0 + phi0_int0
-        # w1_int0 = w1_int0 + phi1_int0
-        # w2_int0 = w2_int0 + phi2_int0
         absv_int0 = torch.abs(varphi1(x_int0))
         grad_term0 = gradient(w0_int0 + w2_int0 * absv_int0, x_int0)
         dd_term0 = torch.sum(grad_term0 * nv_x_int0, dim=1, keepdim=True)  # directional derivative term
-        loss_int0 = torch.mean(int_w0 * ((-1 * dd_term0 + 3 * w1_int0 * gnv_x_int0) ** 2))
+        loss_int0 = torch.mean(int_w0 * ((-1 * dd_term0 + 3 * w1_int0 * gnv_x_int0 -1 * dd_phi_ba_term0 + 3 * phi1_int0 * gnv_x_int0) ** 2))
 
         w0_int1 = model.w_p(x_int1, 0)
         w1_int1 = model.w_p(x_int1, 1)
         w2_int1 = model.w_p(x_int1, 2)
-        # r_int1 = torch.norm(x_int1 - model.imv[0], p=2, dim=1, keepdim=True)
-        # yita_int1 = model._yita(r_int1)
-        # phi0_int1 = model.phi_p(x_int1, 0) * yita_int1 * (r_int1 ** model.lmbd[0])
-        # phi1_int1 = model.phi_p(x_int1, 1) * yita_int1 * (r_int1 ** model.lmbd[0])
-        # phi2_int1 = model.phi_p(x_int1, 2) * yita_int1 * (r_int1 ** model.lmbd[0])
-        # w0_int1 = w0_int1 + phi0_int1
-        # w1_int1 = w1_int1 + phi1_int1
-        # w2_int1 = w2_int1 + phi2_int1
         absv_int1 = torch.abs(varphi0(x_int1))
         grad_term1 = gradient(w0_int1 + w1_int1 * absv_int1, x_int1)
         dd_term1 = torch.sum(grad_term1 * nv_x_int1, dim=1, keepdim=True)
-        loss_int1 = torch.mean(int_w1 * ((-1 * dd_term1 + 5 * w2_int1 * gnv_x_int1) ** 2))
+        loss_int1 = torch.mean(int_w1 * ((-1 * dd_term1 + 5 * w2_int1 * gnv_x_int1 -1 * dd_phi_ba_term1 + 5 * phi2_int1 * gnv_x_int1) ** 2))
 
         w0_int2 = model.w_p(x_int2, 0)
         w1_int2 = model.w_p(x_int2, 1)
         w2_int2 = model.w_p(x_int2, 2)
-        # r_int2 = torch.norm(x_int2 - model.imv[0], p=2, dim=1, keepdim=True)
-        # yita_int2 = model._yita(r_int2)
-        # phi0_int2 = model.phi_p(x_int2, 0) * yita_int2 * (r_int2 ** model.lmbd[0])
-        # phi1_int2 = model.phi_p(x_int2, 1) * yita_int2 * (r_int2 ** model.lmbd[0])
-        # phi2_int2 = model.phi_p(x_int2, 2) * yita_int2 * (r_int2 ** model.lmbd[0])
-        # w0_int2 = w0_int2 + phi0_int2
-        # w1_int2 = w1_int2 + phi1_int2
-        # w2_int2 = w2_int2 + phi2_int2
         absv_int2 = torch.abs(varphi1(x_int2))
         grad_term2 = gradient(w0_int2 + w2_int2 * absv_int2, x_int2)
         dd_term2 = torch.sum(grad_term2 * nv_x_int2, dim=1, keepdim=True)
-        loss_int2 = torch.mean(int_w2 * ((1 * dd_term2 + 7 * w1_int2 * gnv_x_int2) ** 2))
+        loss_int2 = torch.mean(int_w2 * ((1 * dd_term2 + 7 * w1_int2 * gnv_x_int2 + 1 * dd_phi_ba_term2 + 7 * phi1_int2 * gnv_x_int2) ** 2))
 
         w0_int3 = model.w_p(x_int3, 0)
         w1_int3 = model.w_p(x_int3, 1)
         w2_int3 = model.w_p(x_int3, 2)
-        # r_int3 = torch.norm(x_int3 - model.imv[0], p=2, dim=1, keepdim=True)
-        # yita_int3 = model._yita(r_int3)
-        # phi0_int3 = model.phi_p(x_int3, 0) * yita_int3 * (r_int3 ** model.lmbd[0])
-        # phi1_int3 = model.phi_p(x_int3, 1) * yita_int3 * (r_int3 ** model.lmbd[0])
-        # phi2_int3 = model.phi_p(x_int3, 2) * yita_int3 * (r_int3 ** model.lmbd[0])
-        # w0_int3 = w0_int3 + phi0_int3
-        # w1_int3 = w1_int3 + phi1_int3
-        # w2_int3 = w2_int3 + phi2_int3
         absv_int3 = torch.abs(varphi0(x_int3))
         grad_term3 = gradient(w0_int3 + w1_int3 * absv_int3, x_int3)
         dd_term3 = torch.sum(grad_term3 * nv_x_int3, dim=1, keepdim=True)
-        loss_int3 = torch.mean(int_w3 * ((-3 * dd_term3 + 5 * w2_int3 * gnv_x_int3) ** 2))
+        loss_int3 = torch.mean(int_w3 * ((-3 * dd_term3 + 5 * w2_int3 * gnv_x_int3 - 3 * dd_phi_ba_term3 + 5 * phi2_int3 * gnv_x_int3) ** 2))
         loss_int = (loss_int0 + loss_int1 + loss_int2 + loss_int3) / 4
 
-        x_phi0_ba = (x_phi0 - model.imv[0]) / torch.norm(x_phi0 - model.imv[0], p=2, dim=1, keepdim=True)
-        phi0_phi0 = model.phi_p(x_phi0_ba, 0)
-        phi1_phi0 = model.phi_p(x_phi0_ba, 1)
-        phi2_phi0 = model.phi_p(x_phi0_ba, 2)
-        absv_phi0 = torch.abs(varphi1(x_phi0_ba))
-        grad_phi_term0 = gradient(phi0_phi0 + phi2_phi0 * absv_phi0, x_phi0_ba)
+        r_phi0 = torch.norm(x_phi0 - model.imv[0], p=2, dim=1, keepdim=True)
+        yita_phi0 = model._yita(r_phi0)
+        x_ba_phi0 = (x_phi0 - model.imv[0]) / r_phi0
+        phi0_phi0 = model.phi_p(x_ba_phi0, 0) * yita_phi0 * (r_phi0 ** model.lmbd[0])
+        phi1_phi0 = model.phi_p(x_ba_phi0, 1) * yita_phi0 * (r_phi0 ** (model.lmbd[0] - 1))
+        phi2_phi0 = model.phi_p(x_ba_phi0, 2) * yita_phi0 * (r_phi0 ** model.lmbd[0])
+        absv_ba_phi0 = torch.abs(varphi1(x_ba_phi0))
+        grad_phi_term0 = gradient(phi0_phi0 + phi2_phi0 * absv_ba_phi0, x_phi0)
         dd_phi_term0 = torch.sum(grad_phi_term0 * nv_x_phi0, dim=1, keepdim=True)
         loss_phi0 = criterion(-1 * dd_phi_term0 + 3 * phi1_phi0 * gnv_x_phi0, zeros_phi)
 
-        x_phi1_ba = (x_phi1 - model.imv[0]) / torch.norm(x_phi1 - model.imv[0], p=2, dim=1, keepdim=True)
-        phi0_phi1 = model.phi_p(x_phi1_ba, 0)
-        phi1_phi1 = model.phi_p(x_phi1_ba, 1)
-        phi2_phi1 = model.phi_p(x_phi1_ba, 2)
-        absv_phi1 = torch.abs(varphi0(x_phi1_ba))
-        grad_phi_term1 = gradient(phi0_phi1 + phi1_phi1 * absv_phi1, x_phi1_ba)
+        r_phi1 = torch.norm(x_phi1 - model.imv[0], p=2, dim=1, keepdim=True)
+        yita_phi1 = model._yita(r_phi1)
+        x_ba_phi1 = (x_phi1 - model.imv[0]) / r_phi1
+        phi0_phi1 = model.phi_p(x_ba_phi1, 0) * yita_phi1 * (r_phi1 ** model.lmbd[0])
+        phi1_phi1 = model.phi_p(x_ba_phi1, 1) * yita_phi1 * (r_phi1 ** model.lmbd[0])
+        phi2_phi1 = model.phi_p(x_ba_phi1, 2) * yita_phi1 * (r_phi1 ** (model.lmbd[0]-1))
+        absv_ba_phi1 = torch.abs(varphi0(x_ba_phi1))
+        grad_phi_term1 = gradient(phi0_phi1 + phi1_phi1 * absv_ba_phi1, x_phi1)
         dd_phi_term1 = torch.sum(grad_phi_term1 * nv_x_phi1, dim=1, keepdim=True)
         loss_phi1 = criterion(-1 * dd_phi_term1 + 5 * phi2_phi1 * gnv_x_phi1, zeros_phi)
 
-        x_phi2_ba = (x_phi2 - model.imv[0]) / torch.norm(x_phi2 - model.imv[0], p=2, dim=1, keepdim=True)
-        phi0_phi2 = model.phi_p(x_phi2_ba, 0)
-        phi1_phi2 = model.phi_p(x_phi2_ba, 1)
-        phi2_phi2 = model.phi_p(x_phi2_ba, 2)
-        absv_phi2 = torch.abs(varphi1(x_phi2_ba))
-        grad_phi_term2 = gradient(phi0_phi2 + phi2_phi2 * absv_phi2, x_phi2_ba)
+        r_phi2 = torch.norm(x_phi2 - model.imv[0], p=2, dim=1, keepdim=True)
+        yita_phi2 = model._yita(r_phi2)
+        x_ba_phi2 = (x_phi2 - model.imv[0]) / r_phi2
+        phi0_phi2 = model.phi_p(x_ba_phi2, 0) * yita_phi2 * (r_phi2 ** model.lmbd[0])
+        phi1_phi2 = model.phi_p(x_ba_phi2, 1) * yita_phi2 * (r_phi2 ** (model.lmbd[0]-1))
+        phi2_phi2 = model.phi_p(x_ba_phi2, 2) * yita_phi2 * (r_phi2 ** model.lmbd[0])
+        absv_ba_phi2 = torch.abs(varphi1(x_ba_phi2))
+        grad_phi_term2 = gradient(phi0_phi2 + phi2_phi2 * absv_ba_phi2, x_phi2)
         dd_phi_term2 = torch.sum(grad_phi_term2 * nv_x_phi2, dim=1, keepdim=True)
         loss_phi2 = criterion(1 * dd_phi_term2 + 7 * phi1_phi2 * gnv_x_phi2, zeros_phi)
 
-        x_phi3_ba = (x_phi3 - model.imv[0]) / torch.norm(x_phi3 - model.imv[0], p=2, dim=1, keepdim=True)
-        phi0_phi3 = model.phi_p(x_phi3_ba, 0)
-        phi1_phi3 = model.phi_p(x_phi3_ba, 1)
-        phi2_phi3 = model.phi_p(x_phi3_ba, 2)
-        absv_phi3 = torch.abs(varphi0(x_phi3_ba))
-        grad_phi_term3 = gradient(phi0_phi3 + phi1_phi3 * absv_phi3, x_phi3_ba)
+        r_phi3 = torch.norm(x_phi3 - model.imv[0], p=2, dim=1, keepdim=True)
+        yita_phi3 = model._yita(r_phi3)
+        x_ba_phi3 = (x_phi3 - model.imv[0]) / r_phi3
+        phi0_phi3 = model.phi_p(x_ba_phi3, 0) * yita_phi3 * (r_phi3 ** model.lmbd[0])
+        phi1_phi3 = model.phi_p(x_ba_phi3, 1) * yita_phi3 * (r_phi3 ** model.lmbd[0])
+        phi2_phi3 = model.phi_p(x_ba_phi3, 2) * yita_phi3 * (r_phi3 ** (model.lmbd[0]-1))
+        absv_ba_phi3 = torch.abs(varphi0(x_ba_phi3))
+        grad_phi_term3 = gradient(phi0_phi3 + phi1_phi3 * absv_ba_phi3, x_phi3)
         dd_phi_term3 = torch.sum(grad_phi_term3 * nv_x_phi3, dim=1, keepdim=True)
         loss_phi3 = criterion(-3 * dd_phi_term3 + 5 * phi2_phi3 * gnv_x_phi3, zeros_phi)
+
+        # x_phi0_ba = (x_phi0 - model.imv[0]) / torch.norm(x_phi0 - model.imv[0], p=2, dim=1, keepdim=True)
+        # phi0_phi0 = model.phi_p(x_phi0_ba, 0)
+        # phi1_phi0 = model.phi_p(x_phi0_ba, 1)
+        # phi2_phi0 = model.phi_p(x_phi0_ba, 2)
+        # absv_phi0 = torch.abs(varphi1(x_phi0_ba))
+        # grad_phi_term0 = gradient(phi0_phi0 + phi2_phi0 * absv_phi0, x_phi0_ba)
+        # dd_phi_term0 = torch.sum(grad_phi_term0 * nv_x_phi0, dim=1, keepdim=True)
+        # loss_phi0 = criterion(-1 * dd_phi_term0 + 3 * phi1_phi0 * gnv_x_phi0, zeros_phi)
+        #
+        # x_phi1_ba = (x_phi1 - model.imv[0]) / torch.norm(x_phi1 - model.imv[0], p=2, dim=1, keepdim=True)
+        # phi0_phi1 = model.phi_p(x_phi1_ba, 0)
+        # phi1_phi1 = model.phi_p(x_phi1_ba, 1)
+        # phi2_phi1 = model.phi_p(x_phi1_ba, 2)
+        # absv_phi1 = torch.abs(varphi0(x_phi1_ba))
+        # grad_phi_term1 = gradient(phi0_phi1 + phi1_phi1 * absv_phi1, x_phi1_ba)
+        # dd_phi_term1 = torch.sum(grad_phi_term1 * nv_x_phi1, dim=1, keepdim=True)
+        # loss_phi1 = criterion(-1 * dd_phi_term1 + 5 * phi2_phi1 * gnv_x_phi1, zeros_phi)
+        #
+        # x_phi2_ba = (x_phi2 - model.imv[0]) / torch.norm(x_phi2 - model.imv[0], p=2, dim=1, keepdim=True)
+        # phi0_phi2 = model.phi_p(x_phi2_ba, 0)
+        # phi1_phi2 = model.phi_p(x_phi2_ba, 1)
+        # phi2_phi2 = model.phi_p(x_phi2_ba, 2)
+        # absv_phi2 = torch.abs(varphi1(x_phi2_ba))
+        # grad_phi_term2 = gradient(phi0_phi2 + phi2_phi2 * absv_phi2, x_phi2_ba)
+        # dd_phi_term2 = torch.sum(grad_phi_term2 * nv_x_phi2, dim=1, keepdim=True)
+        # loss_phi2 = criterion(1 * dd_phi_term2 + 7 * phi1_phi2 * gnv_x_phi2, zeros_phi)
+        #
+        # x_phi3_ba = (x_phi3 - model.imv[0]) / torch.norm(x_phi3 - model.imv[0], p=2, dim=1, keepdim=True)
+        # phi0_phi3 = model.phi_p(x_phi3_ba, 0)
+        # phi1_phi3 = model.phi_p(x_phi3_ba, 1)
+        # phi2_phi3 = model.phi_p(x_phi3_ba, 2)
+        # absv_phi3 = torch.abs(varphi0(x_phi3_ba))
+        # grad_phi_term3 = gradient(phi0_phi3 + phi1_phi3 * absv_phi3, x_phi3_ba)
+        # dd_phi_term3 = torch.sum(grad_phi_term3 * nv_x_phi3, dim=1, keepdim=True)
+        # loss_phi3 = criterion(-3 * dd_phi_term3 + 5 * phi2_phi3 * gnv_x_phi3, zeros_phi)
         loss_phi = (loss_phi0 + loss_phi1 + loss_phi2 + loss_phi3) / 4
 
-        loss = torch.sqrt(loss_pde) + 3.1623 * torch.sqrt(loss_int) + 10 * torch.sqrt(loss_bc) + torch.sqrt(loss_phi)
+        loss = torch.sqrt(loss_pde) + 3.1623 * torch.sqrt(loss_int) + 10 * torch.sqrt(loss_bc) + 1*torch.sqrt(loss_phi)
+        # \+ 3.1623 * torch.sqrt(loss_ba_int))
 
         loss.backward()
         opt.step()
@@ -406,5 +473,5 @@ if __name__ == '__main__':
                   f"loss: {loss} loss_pde: {loss_pde} loss_bc: {loss_bc} loss_int: {loss_int} loss_phi: {loss_phi}")
 
         if (iter + 1) % 500 == 0:
-            save_path = os.path.join('../saved_models/2D_material/', f'ReCoNN_{iter + 1}.pt')
+            save_path = os.path.join('../saved_models/2D_material/005/', f'ReCoNN_{iter + 1}.pt')
             torch.save(model.state_dict(), save_path)
