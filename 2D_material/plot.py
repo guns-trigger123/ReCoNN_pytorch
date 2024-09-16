@@ -1,14 +1,6 @@
 import matplotlib.pyplot as plt
 from utils import *
-from train_ReCoNN_2D_material import MLP_2D_InteriorMaterial
-
-
-def varphi0(x):
-    return x[:, 0:1]
-
-
-def varphi1(x):
-    return x[:, 1:2]
+from train_ReCoNN_2D_material_plain import MLP_2D_InteriorMaterial
 
 
 def sigma(x):
@@ -59,9 +51,7 @@ def real(x):
 
 
 def plot_ReCoNN(iteration, experiment):
-    model = MLP_2D_InteriorMaterial([torch.tensor([[0.0, 0.0]])],
-                                    [varphi0, varphi1],
-                                    [varphi0, varphi1])
+    model = MLP_2D_InteriorMaterial()
     model.load_state_dict(torch.load(("../saved_models/2D_material/" + experiment + f"/ReCoNN_{iteration}.pt")))
 
     x, y = torch.linspace(-1, 1, 256), torch.linspace(-1, 1, 256)
@@ -80,9 +70,10 @@ def plot_ReCoNN(iteration, experiment):
     plt.scatter(input[:, 0:1],
                 input[:, 1:2],
                 s=0.5,
-                # c=out,
+                c=out,
                 # c=real(input),
-                c=torch.abs(out - real(input)),
+                # c=torch.abs(out - real(input)),
+                # c=torch.abs(out - real(input)) / (1 + real(input)),
                 # c=lap_out_withgrad,
                 # c=lap_real,
                 # c=torch.abs(lap_real-lap_out_withgrad),
@@ -91,17 +82,16 @@ def plot_ReCoNN(iteration, experiment):
     plt.xlim(-1.1, 1.1)
     plt.ylim(-1.1, 1.1)
     plt.colorbar()
-    # plt.clim(0,0.04)
+    # plt.clim(0,1)
     plt.title("ReCoNN")
-    # plt.title("error")
+    # plt.title("absolute error")
+    # plt.title("relative error")
     # plt.title("real")
     plt.show()
 
 
 def plot_ReCoNN_phi(iteration, experiment):
-    model = MLP_2D_InteriorMaterial([torch.tensor([[0.0, 0.0]])],
-                                    [varphi0, varphi1],
-                                    [varphi0, varphi1])
+    model = MLP_2D_InteriorMaterial()
     model.load_state_dict(torch.load(("../saved_models/2D_material/" + experiment + f"/ReCoNN_{iteration}.pt")))
 
     def interface(theta):
@@ -112,10 +102,8 @@ def plot_ReCoNN_phi(iteration, experiment):
     theta = torch.linspace(0, 2 * torch.pi, 1000).reshape(-1, 1)
     x = interface(theta)
 
-    phi0 = model.phi_p(x, 0)
-    phi1 = model.phi_p(x, 1)
-    phi2 = model.phi_p(x, 2)
-    out = model.phi_p(x, 0) + model.phi_p(x, 1) * torch.abs(varphi0(x)) + model.phi_p(x, 2) * torch.abs(varphi1(x))
+    phi_out = model.phi(x)
+    out = phi_out[:, 0:1] + phi_out[:, 1:2] * torch.abs(x[:, 0:1]) + phi_out[:, 2:3] * torch.abs(x[:, 1:2])
     out = out.detach()
 
     ones = torch.ones_like(x[:, 0:1], device=x.device)
@@ -157,6 +145,6 @@ def plot_ReCoNN_phi(iteration, experiment):
 
 if __name__ == '__main__':
     ITER = 50000
-    EXP = "005"
+    EXP = "experiment 3"
     plot_ReCoNN(ITER, EXP)
     plot_ReCoNN_phi(ITER, EXP)

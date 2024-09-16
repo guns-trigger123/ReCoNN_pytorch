@@ -129,6 +129,8 @@ $$
 
 #### Test numerical experiments with 3 different loss-function settings:
 
+Remark that resample every 1000 iterations.  
+
 | experiment number | Interface loss  | bc - $\phi$ loss |
 | ---- | ---- | ---- |
 | 1 | regular component + **complete** singular component | **complete** singular component |
@@ -168,12 +170,33 @@ $$\phi_1(\frac{x-x_0}{\lvert x-x_0 \rvert})+\phi_2(\frac{x-x_0}{\lvert x-x_0 \rv
 #### Results of the real solution with those of "ReCoNNs".
 
 ![real](./assets/2D_material/real.png)
-![ReCoNN](./assets/2D_material/ReCoNN.png)
-![error](./assets/2D_material/error.png)
+
+1. experiment 1
+
+![ReCoNN](./assets/2D_material/experiment%201/ReCoNN.png)
+![error](./assets/2D_material/experiment%201/error.png)
 
 The NN function $\phi$ and the target $\sin$ fuction.
 
-![phi](./assets/2D_material/ReCoNN_phi.png)
+![phi](./assets/2D_material/experiment%201/ReCoNN_phi.png)
+
+2. experiment 2
+
+![ReCoNN](./assets/2D_material/experiment%202/ReCoNN.png)
+![error](./assets/2D_material/experiment%202/error.png)
+
+The NN function $\phi$ and the target $\sin$ fuction.
+
+![phi](./assets/2D_material/experiment%202/ReCoNN_phi.png)
+
+3. experiment 3
+
+![ReCoNN](./assets/2D_material/experiment%203/ReCoNN.png)
+![error](./assets/2D_material/experiment%203/error.png)
+
+The NN function $\phi$ and the target $\sin$ fuction.
+
+![phi](./assets/2D_material/experiment%203/ReCoNN_phi.png)
 
 ## Citation
 
