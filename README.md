@@ -70,7 +70,7 @@ Compare the results of real solution with those of "ReCoNNs".
 
 ### 3 L-shape domain
 
-The neuron-counts for the implemented NN:
+#### The neuron-counts for the implemented NN:
 
 - Function $w$ :
   
@@ -84,7 +84,7 @@ The neuron-counts for the implemented NN:
 
 - Total : $2554 = 2012+541+1$
 
-Results of the real solution with those of "ReCoNNs".
+#### Results of the real solution with those of "ReCoNNs".
 
 ![real](./assets/2D_L_shape/real.png)
 ![ReCoNN](./assets/2D_L_shape/ReCoNN.png)
@@ -100,15 +100,7 @@ The trainalbe parameter $\lambda$ changes with the iterations.
 
 ### 4 Interior material vertices
 
-It is hard to understand/implement this experiment for the 2 reasons below.
-
-1. The description of the NN structure is not very clear.
-
-2. The most confusing part is the loss for the interface. In my implementation, I did not take the $\phi$ part of NN
-   into consideration as the "input" of formula derivation in Section 4.1, specifically equations (13 -18), are not "
-   normalized input". Maybe there are more formula derivation for the "normalized input" ?
-
-The neuron-counts for the implemented NN (personal guess) :
+#### The neuron-counts for the implemented NN :
 
 - Function $w$ :
 
@@ -122,7 +114,7 @@ The neuron-counts for the implemented NN (personal guess) :
 
 - Total : $2710=2136+573+1$
 
-The specific expression of $u_{NN}$ in my implementation (personal guess) :
+#### The specific expression of $u_{NN}$ in the implementation:
 
 $$
 u_{NN} = w_{1,0}(x) + w_{2,0}(x)\eta(\lvert x-x_0 \rvert) + [w_{1,1}(x)+ w_{2,1}(x)\eta(\lvert x-x_0 \rvert)]\lvert \varphi_1(x)\rvert + [w_{1,2}(x)+ w_{2,2}(x)\eta(\lvert x-x_0 \rvert)]\lvert \varphi_2(x)\rvert + 
@@ -135,7 +127,45 @@ $$
 \varphi_1(\vec{x}) = \hat\varphi_1(\vec{x}) = x_1 \quad\rm{and}\quad \varphi_2(\vec{x}) = \hat\varphi_2(\vec{x}) = x_2
 $$
 
-Results of the real solution with those of "ReCoNNs".
+#### Test numerical experiments with 3 different loss-function settings:
+
+| experiment number | Interface loss  | bc - $\phi$ loss |
+| ---- | ---- | ---- |
+| 1 | regular component + **complete** singular component | **complete** singular component |
+| 2 | regular component + **complete** singular component | **simplified** singular component |
+| 3 | regular component | **simplified** singular component |
+
+1. Same as the **official** version : https://github.com/Mathmode/ReCoNNs .
+
+- Interface loss : regular component + complete singular component which is
+
+$$\eta(\lvert x-x_0 \rvert){\lvert x-x_0 \rvert}^{\lambda}[\phi_1(\frac{x-x_0}{\lvert x-x_0 \rvert})+\phi_2(\frac{x-x_0}{\lvert x-x_0 \rvert})\lvert \hat\varphi_1(\frac{x-x_0}{\lvert x-x_0 \rvert}) \rvert+\phi_3(\frac{x-x_0}{\lvert x-x_0 \rvert})\lvert \hat\varphi_2(\frac{x-x_0}{\lvert x-x_0 \rvert}) \rvert]$$
+
+- bc - $\phi$ loss : complete singular component which is
+
+$$\eta(\lvert x-x_0 \rvert){\lvert x-x_0 \rvert}^{\lambda}[\phi_1(\frac{x-x_0}{\lvert x-x_0 \rvert})+\phi_2(\frac{x-x_0}{\lvert x-x_0 \rvert})\lvert \hat\varphi_1(\frac{x-x_0}{\lvert x-x_0 \rvert}) \rvert+\phi_3(\frac{x-x_0}{\lvert x-x_0 \rvert})\lvert \hat\varphi_2(\frac{x-x_0}{\lvert x-x_0 \rvert}) \rvert]$$
+
+2. simplified bc - $\phi$ loss version.
+
+- Interface loss : regular component + complete singular component which is
+
+$$\eta(\lvert x-x_0 \rvert){\lvert x-x_0 \rvert}^{\lambda}[\phi_1(\frac{x-x_0}{\lvert x-x_0 \rvert})+\phi_2(\frac{x-x_0}{\lvert x-x_0 \rvert})\lvert \hat\varphi_1(\frac{x-x_0}{\lvert x-x_0 \rvert}) \rvert+\phi_3(\frac{x-x_0}{\lvert x-x_0 \rvert})\lvert \hat\varphi_2(\frac{x-x_0}{\lvert x-x_0 \rvert}) \rvert]$$
+
+- bc - $\phi$ loss : simplified singular component ( take $\frac{x-x_0}{\lvert x-x_0 \rvert}$ as the input when computing gradient) which is
+
+$$\phi_1(\frac{x-x_0}{\lvert x-x_0 \rvert})+\phi_2(\frac{x-x_0}{\lvert x-x_0 \rvert})\lvert \hat\varphi_1(\frac{x-x_0}{\lvert x-x_0 \rvert}) \rvert+\phi_3(\frac{x-x_0}{\lvert x-x_0 \rvert})\lvert \hat\varphi_2(\frac{x-x_0}{\lvert x-x_0 \rvert}) \rvert$$
+
+3. simplified interface loss and bc - $\phi$ loss version.
+
+- Interface loss : regular component 
+
+- bc - $\phi$ loss : simplified singular component ( take $\frac{x-x_0}{\lvert x-x_0 \rvert}$ as the input when computing gradient) which is
+
+$$\phi_1(\frac{x-x_0}{\lvert x-x_0 \rvert})+\phi_2(\frac{x-x_0}{\lvert x-x_0 \rvert})\lvert \hat\varphi_1(\frac{x-x_0}{\lvert x-x_0 \rvert}) \rvert+\phi_3(\frac{x-x_0}{\lvert x-x_0 \rvert})\lvert \hat\varphi_2(\frac{x-x_0}{\lvert x-x_0 \rvert}) \rvert$$
+
+
+
+#### Results of the real solution with those of "ReCoNNs".
 
 ![real](./assets/2D_material/real.png)
 ![ReCoNN](./assets/2D_material/ReCoNN.png)
