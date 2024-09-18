@@ -6,6 +6,7 @@ This is the **unofficial** pytorch version implementation of the paper "Regulari
 for
 solving Partial Differential Equations".
 
+<!--
 ## Tips
 
 There are several mistakes about the equations of the paper.
@@ -48,6 +49,7 @@ $$
    implementation."
 
 maybe there are other mistakes.
+-->
 
 ## Numerical results
 
@@ -171,12 +173,12 @@ $$\phi_1(\frac{x-x_0}{\lvert x-x_0 \rvert})+\phi_2(\frac{x-x_0}{\lvert x-x_0 \rv
 
 ![real](./assets/2D_material/real.png)
 
-1. experiment 1
+1. experiment 1 (Same as the **official** version : https://github.com/Mathmode/ReCoNNs)
 
 ![ReCoNN](./assets/2D_material/experiment%201/ReCoNN.png)
 ![error](./assets/2D_material/experiment%201/error.png)
 
-The NN function $\phi$ and the target $\sin$ fuction.
+The NN function $\phi$ and the target piecewise $\sin$-like fuction.
 
 ![phi](./assets/2D_material/experiment%201/ReCoNN_phi.png)
 
@@ -185,7 +187,7 @@ The NN function $\phi$ and the target $\sin$ fuction.
 ![ReCoNN](./assets/2D_material/experiment%202/ReCoNN.png)
 ![error](./assets/2D_material/experiment%202/error.png)
 
-The NN function $\phi$ and the target $\sin$ fuction.
+The NN function $\phi$ and the target piecewise $\sin$-like fuction.
 
 ![phi](./assets/2D_material/experiment%202/ReCoNN_phi.png)
 
@@ -194,7 +196,7 @@ The NN function $\phi$ and the target $\sin$ fuction.
 ![ReCoNN](./assets/2D_material/experiment%203/ReCoNN.png)
 ![error](./assets/2D_material/experiment%203/error.png)
 
-The NN function $\phi$ and the target $\sin$ fuction.
+The NN function $\phi$ and the target piecewise $\sin$-like fuction.
 
 ![phi](./assets/2D_material/experiment%203/ReCoNN_phi.png)
 
