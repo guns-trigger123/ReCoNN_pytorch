@@ -7,7 +7,7 @@ for
 solving Partial Differential Equations".
 
 cite
-'''
+```
 @article{TAYLOR2025113954,
 title = {Regularity-conforming neural networks (ReCoNNs) for solving partial differential equations},
 journal = {Journal of Computational Physics},
@@ -20,7 +20,7 @@ url = {https://www.sciencedirect.com/science/article/pii/S0021999125002372},
 author = {Jamie M. Taylor and David Pardo and Judit Muñoz-Matute},
 keywords = {Regularity-conforming, Neural networks, Interface condition, Transmission problem, Singularities, PINNs},
 }
-'''
+```
 
 <!--
 ## Tips
